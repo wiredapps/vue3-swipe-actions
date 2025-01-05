@@ -74,7 +74,6 @@ export default {
       return;
     }
 
-    console.log(binding.modifiers);
     // FIX to get around not having multiple modifiers in template
     binding.modifiers = binding.value;
     binding.value = binding.value.handler;

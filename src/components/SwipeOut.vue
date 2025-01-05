@@ -1,18 +1,31 @@
 <script setup lang="ts">
-import { ref, watch, onBeforeUnmount, useSlots } from "vue";
+import { ref, watch, onBeforeUnmount, useSlots, type Ref, type VNodeRef } from "vue";
 import vTouchPan from "../directives/touch-horizontal-pan";
 
-function translateX(x) {
+interface PanEvent {
+  evt: Event;
+  position: { left: number; top: number };
+  direction: string;
+  isFirst: boolean;
+  isFinal: boolean;
+  isMouse: boolean;
+  duration: number;
+  distance: { x: number; y: number };
+  offset: { x: number; y: number };
+  delta: { x: number; y: number };
+}
+
+function translateX(x: number) {
   if (x === 0) return "";
 
   return `translate3d(${x}px, 0, 0)`;
 }
 
-function clientWidth(ref) {
+function clientWidth(ref: HTMLDivElement) {
   return ref ? ref.clientWidth : 0;
 }
 
-function areEqual(a, b) {
+function areEqual(a: any, b: any) {
   if (!a && !b) return true;
   return a === b;
 }
@@ -51,18 +64,19 @@ const isActive = ref(false);
 const leftActionsWidth = ref(0);
 const rightActionsWidth = ref(0);
 const startLeft = ref(0);
-const timer = ref(null);
-const frame = ref(null);
-const contentRef = ref(null);
-const leftRef = ref(null);
-const rightRef = ref(null);
-const elRef = ref(null);
+const timer: Ref<number | undefined> = ref();
+const frame: Ref<number | undefined> = ref();
+const contentRef: VNodeRef = ref(null);
+const leftRef: VNodeRef = ref(null);
+const rightRef: VNodeRef = ref(null);
+const elRef: VNodeRef = ref(null);
 
 watch(
   () => props.revealed,
   (val) => {
     if (innerRevealed.value === val) return;
-    reveal(val, true);
+    // TODO this smells messy types.
+    reveal(val as "left" | "right" | false, true);
   }
 );
 
@@ -87,7 +101,7 @@ const distanceSwiped = () => {
   return contentRect.left - elementRect.left - elRef.value.clientLeft;
 };
 
-const onPan = (pan) => {
+const onPan = (pan: PanEvent) => {
   if (props.disabled) return null;
 
   if (pan.isFirst) return startListener(pan);
@@ -99,7 +113,7 @@ const onPan = (pan) => {
   return swipeListener(pan);
 };
 
-const startListener = ({ distance }) => {
+const startListener = ({ distance }: PanEvent) => {
   elRef.value.classList.add("swipeout--no-transition");
   if (distance.y <= 5) {
     leftActionsWidth.value = leftRef.value ? leftRef.value.clientWidth : 0;
@@ -112,7 +126,7 @@ const startListener = ({ distance }) => {
   }
 };
 
-const swipeListener = ({ offset }) => {
+const swipeListener = ({ offset }: PanEvent) => {
   const newX = offset.x + startLeft.value;
   if (!slots.left && newX > 0) return animateSlide(0);
 
@@ -121,7 +135,7 @@ const swipeListener = ({ offset }) => {
   return animateSlide(offset.x + startLeft.value);
 };
 
-const stopListener = ({ offset, distance }) => {
+const stopListener = ({ offset, distance }: PanEvent) => {
   elRef.value.classList.remove("swipeout--no-transition");
   isActive.value = false;
   emit("active", false);
@@ -132,17 +146,20 @@ const stopListener = ({ offset, distance }) => {
     (distance.x >= props.threshold &&
       ((startLeft.value > 0 && distance.x < leftActionsWidth.value) ||
         (startLeft.value < 0 && distance.x < rightActionsWidth.value)))
-  )
+  ) {
     return reveal(false);
+  }
   return reveal(newX > 0 ? "left" : "right");
 };
 
-const reveal = (dir, recalculateWidth) => {
+const reveal = (dir: "left" | "right" | false, recalculateWidth?: boolean) => {
   if (isActive.value && areEqual(innerRevealed.value, dir)) return;
 
   const refs = { left: leftRef, right: rightRef };
 
-  if (dir && !refs[dir]) dir = false;
+  if (dir && !refs[dir]) {
+    dir = false;
+  }
 
   innerRevealed.value = dir;
   emit("update:revealed", dir);
@@ -173,7 +190,7 @@ const reveal = (dir, recalculateWidth) => {
   }
 };
 
-const shiftLeftActions = (newX) => {
+const shiftLeftActions = (newX: number) => {
   if (!slots.left) return;
 
   if (newX < 0) newX = 0;
@@ -195,7 +212,7 @@ const shiftLeftActions = (newX) => {
   }
 };
 
-const shiftRightActions = (newX) => {
+const shiftRightActions = (newX: number) => {
   if (!slots.right) return;
 
   if (newX > 0) newX = 0;
@@ -214,8 +231,11 @@ const shiftRightActions = (newX) => {
   }
 };
 
-const animateSlide = (to) => {
-  cancelAnimationFrame(frame.value);
+const animateSlide = (to: number) => {
+  if (frame.value !== undefined) {
+    cancelAnimationFrame(frame.value);
+  }
+
   frame.value = requestAnimationFrame(() => {
     contentRef.value.style.transform = translateX(to);
     shiftLeftActions(to);
@@ -225,7 +245,10 @@ const animateSlide = (to) => {
 
 onBeforeUnmount(() => {
   clearTimeout(timer.value);
-  cancelAnimationFrame(frame.value);
+
+  if (frame.value !== undefined) {
+    cancelAnimationFrame(frame.value);
+  }
 });
 </script>
 
