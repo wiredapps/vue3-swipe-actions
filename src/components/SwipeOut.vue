@@ -1,6 +1,34 @@
+<template>
+  <div ref="elRef" :class="['swipeout', { 'swipeout--disabled': disabled }]">
+    <div v-if="$slots.left" ref="leftRef" class="swipeout-left">
+      <slot name="left" :close="close"></slot>
+    </div>
+
+    <div v-if="$slots.right" ref="rightRef" class="swipeout-right">
+      <slot name="right" :close="close"></slot>
+    </div>
+
+    <div ref="contentRef" class="swipeout-content" v-touch-pan="!disabled && ($slots.left || $slots.right)
+      ? {
+        handler: onPan,
+        horizontal: true,
+        mouse: true,
+        prevent: !passiveListeners,
+        mousePrevent: true,
+      }
+      : undefined
+      ">
+      <slot :revealLeft="revealLeft" :revealRight="revealRight" :disabled="disabled" :close="close"
+        :revealed="innerRevealed"></slot>
+    </div>
+  </div>
+</template>
+
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount, useSlots, type Ref, type VNodeRef } from "vue";
 import vTouchPan from "../directives/touch-horizontal-pan";
+import { translateX } from "../utils/translateX";
+import { areEqual } from "../utils/areEqual";
 
 interface PanEvent {
   evt: Event;
@@ -15,47 +43,28 @@ interface PanEvent {
   delta: { x: number; y: number };
 }
 
-function translateX(x: number) {
-  if (x === 0) return "";
-
-  return `translate3d(${x}px, 0, 0)`;
+interface SwipeOutProps {
+  threshold?: number;
+  revealed?: string | boolean;
+  disabled?: boolean;
+  passiveListeners?: boolean;
 }
 
-function clientWidth(ref: HTMLDivElement) {
-  return ref ? ref.clientWidth : 0;
-}
-
-function areEqual(a: any, b: any) {
-  if (!a && !b) return true;
-  return a === b;
-}
-
-const props = defineProps({
-  threshold: {
-    type: Number,
-    default: 45,
-  },
-  revealed: {
-    type: [String, Boolean],
-  },
-  disabled: {
-    type: Boolean,
-    default: false,
-  },
-  passiveListeners: {
-    type: Boolean,
-    default: false,
-  },
+const props = withDefaults(defineProps<SwipeOutProps>(), {
+  threshold: 45,
+  revealed: false,
+  disabled: false,
+  passiveListeners: false,
 });
 
-const emit = defineEmits([
-  "update:revealed",
-  "active",
-  "closed",
-  "revealed",
-  "leftRevealed",
-  "rightRevealed",
-]);
+const emit = defineEmits<{
+  "update:revealed": [value: "left" | "right" | false]
+  active: [value: boolean]
+  closed: [void]
+  revealed: [value: { side: "left" | "right"; close: () => void }]
+  leftRevealed: [value: { close: () => void }]
+  rightRevealed: [value: { close: () => void }]
+}>();
 
 const slots = useSlots();
 
@@ -75,7 +84,7 @@ watch(
   () => props.revealed,
   (val) => {
     if (innerRevealed.value === val) return;
-    // TODO this smells messy types.
+    // TODO this smells of messy types.
     reveal(val as "left" | "right" | false, true);
   }
 );
@@ -153,7 +162,9 @@ const stopListener = ({ offset, distance }: PanEvent) => {
 };
 
 const reveal = (dir: "left" | "right" | false, recalculateWidth?: boolean) => {
-  if (isActive.value && areEqual(innerRevealed.value, dir)) return;
+  if (isActive.value && areEqual(innerRevealed.value, dir)) {
+    return;
+  }
 
   const refs = { left: leftRef, right: rightRef };
 
@@ -172,7 +183,7 @@ const reveal = (dir: "left" | "right" | false, recalculateWidth?: boolean) => {
 
   if (dir === "left" && leftRef.value) {
     leftActionsWidth.value = recalculateWidth
-      ? clientWidth(leftRef.value)
+      ? leftRef.value.clientWidth
       : leftActionsWidth.value;
     animateSlide(leftActionsWidth.value);
     emit("revealed", { side: "left", close });
@@ -182,7 +193,7 @@ const reveal = (dir: "left" | "right" | false, recalculateWidth?: boolean) => {
 
   if (dir === "right" && rightRef.value) {
     rightActionsWidth.value = recalculateWidth
-      ? clientWidth(rightRef.value)
+      ? rightRef.value.clientWidth
       : rightActionsWidth.value;
     animateSlide(-rightActionsWidth.value);
     emit("revealed", { side: "right", close });
@@ -251,40 +262,6 @@ onBeforeUnmount(() => {
   }
 });
 </script>
-
-<template>
-  <div ref="elRef" :class="['swipeout', { 'swipeout--disabled': disabled }]">
-    <div v-if="$slots.left" ref="leftRef" class="swipeout-left">
-      <slot name="left" :close="close"></slot>
-    </div>
-    <div v-if="$slots.right" ref="rightRef" class="swipeout-right">
-      <slot name="right" :close="close"></slot>
-    </div>
-    <div
-      ref="contentRef"
-      class="swipeout-content"
-      v-touch-pan="
-        !disabled && ($slots.left || $slots.right)
-          ? {
-              handler: onPan,
-              horizontal: true,
-              mouse: true,
-              prevent: !passiveListeners,
-              mousePrevent: true,
-            }
-          : undefined
-      "
-    >
-      <slot
-        :revealLeft="revealLeft"
-        :revealRight="revealRight"
-        :disabled="disabled"
-        :close="close"
-        :revealed="innerRevealed"
-      ></slot>
-    </div>
-  </div>
-</template>
 
 <style scoped>
 .swipeout {
