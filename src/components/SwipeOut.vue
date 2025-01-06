@@ -1,29 +1,3 @@
-<template>
-  <div ref="elRef" :class="['swipeout', { 'swipeout--disabled': disabled }]">
-    <div v-if="$slots.left" ref="leftRef" class="swipeout-left">
-      <slot name="left" :close="close"></slot>
-    </div>
-
-    <div v-if="$slots.right" ref="rightRef" class="swipeout-right">
-      <slot name="right" :close="close"></slot>
-    </div>
-
-    <div ref="contentRef" class="swipeout-content" v-touch-pan="!disabled && ($slots.left || $slots.right)
-      ? {
-        handler: onPan,
-        horizontal: true,
-        mouse: true,
-        prevent: !passiveListeners,
-        mousePrevent: true,
-      }
-      : undefined
-      ">
-      <slot :revealLeft="revealLeft" :revealRight="revealRight" :disabled="disabled" :close="close"
-        :revealed="innerRevealed"></slot>
-    </div>
-  </div>
-</template>
-
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount, useSlots, type Ref, type VNodeRef } from "vue";
 import vTouchPan from "../directives/touch-horizontal-pan";
@@ -263,7 +237,33 @@ onBeforeUnmount(() => {
 });
 </script>
 
-<style scoped>
+<template>
+  <div ref="elRef" :class="['swipeout', { 'swipeout--disabled': disabled }]">
+    <div v-if="$slots.left" ref="leftRef" class="swipeout-left">
+      <slot name="left" :close="close"></slot>
+    </div>
+
+    <div v-if="$slots.right" ref="rightRef" class="swipeout-right">
+      <slot name="right" :close="close"></slot>
+    </div>
+
+    <div ref="contentRef" class="swipeout-content" v-touch-pan="!disabled && ($slots.left || $slots.right)
+      ? {
+        handler: onPan,
+        horizontal: true,
+        mouse: true,
+        prevent: !passiveListeners,
+        mousePrevent: true,
+      }
+      : undefined
+      ">
+      <slot :revealLeft="revealLeft" :revealRight="revealRight" :disabled="disabled" :close="close"
+        :revealed="innerRevealed"></slot>
+    </div>
+  </div>
+</template>
+
+<style>
 .swipeout {
   position: relative;
   overflow: hidden;
