@@ -3,7 +3,7 @@
     <SwipeOut
       v-for="(item, index) in items"
       :key="index"
-      ref="refs"
+      ref="itemRefs"
       class="swipeout-list-item"
       :disabled="disabled || itemDisabled(item)"
       :threshold="threshold"
@@ -49,13 +49,13 @@
 import { ref, watch, defineProps, defineEmits, withDefaults, useSlots } from "vue";
 import SwipeOut from "./SwipeOut.vue";
 
-interface SwipeListProps<A> {
-  items: A[];
+interface SwipeListProps<Item> {
+  items: Item[];
   itemKey?: string;
   threshold?: number;
-  revealed?: Record<string, A>;
+  revealed?: Record<string, Item>;
   disabled?: boolean;
-  itemDisabled?: (item: A) => boolean;
+  itemDisabled?: (item: Item) => boolean;
   passiveListeners?: boolean;
 }
 
@@ -97,6 +97,7 @@ watch(
 
 defineExpose({
   revealRight(index: number) {
+    console.log("revealRight", itemRefs.value[index], itemRefs.value);
     if (itemRefs.value[index]) {
       itemRefs.value[index]?.revealRight();
     }
