@@ -7,9 +7,7 @@ import SwipeOut from "./components/SwipeOut.vue";
 
   <SwipeOut class="card">
     <template v-slot>
-      <div ref="content" class="card-content">
-        Swipe!
-      </div>
+      <div ref="content" class="card-content">Swipe!</div>
     </template>
 
     <template v-slot:left="{ close }">
@@ -91,7 +89,6 @@ import SwipeOut from "./components/SwipeOut.vue";
 .swipeout-action.green:hover {
   background-color: darken(rgb(76, 217, 100), 5%);
 }
-
 
 .swipeout-list-item {
   flex: 1;

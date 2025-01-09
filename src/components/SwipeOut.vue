@@ -78,6 +78,12 @@ const revealRight = () => {
   reveal("right", true);
 };
 
+defineExpose({
+  close,
+  revealLeft,
+  revealRight,
+});
+
 const distanceSwiped = () => {
   const contentRect = contentRef.value.getBoundingClientRect();
   const elementRect = elRef.value.getBoundingClientRect();
@@ -247,18 +253,28 @@ onBeforeUnmount(() => {
       <slot name="right" :close="close"></slot>
     </div>
 
-    <div ref="contentRef" class="swipeout-content" v-touch-pan="!disabled && ($slots.left || $slots.right)
-      ? {
-        handler: onPan,
-        horizontal: true,
-        mouse: true,
-        prevent: !passiveListeners,
-        mousePrevent: true,
-      }
-      : undefined
-      ">
-      <slot :revealLeft="revealLeft" :revealRight="revealRight" :disabled="disabled" :close="close"
-        :revealed="innerRevealed"></slot>
+    <div
+      ref="contentRef"
+      class="swipeout-content"
+      v-touch-pan="
+        !disabled && ($slots.left || $slots.right)
+          ? {
+              handler: onPan,
+              horizontal: true,
+              mouse: true,
+              prevent: !passiveListeners,
+              mousePrevent: true,
+            }
+          : undefined
+      "
+    >
+      <slot
+        :revealLeft="revealLeft"
+        :revealRight="revealRight"
+        :disabled="disabled"
+        :close="close"
+        :revealed="innerRevealed"
+      ></slot>
     </div>
   </div>
 </template>

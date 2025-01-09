@@ -222,6 +222,10 @@ export default {
   updated(el, { oldValue, value, modifiers }) {
     const ctx = el.__qtouchpan;
 
+    if (!value) {
+      return;
+    }
+
     if (oldValue !== value) {
       ctx.handler = value.handler;
     }
