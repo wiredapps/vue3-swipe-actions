@@ -12,9 +12,7 @@
       @leftRevealed="setLastEvent('leftRevealed', $event)"
       @rightRevealed="setLastEvent('rightRevealed', $event)"
     >
-      <template
-        v-slot="{ item, index, revealLeft, revealRight, close, revealed, disabled }"
-      >
+      <template v-slot="{ item, index, revealed, disabled }">
         <div ref="content" class="card-content" @click.native="itemClick(item)">
           <h2>{{ item.title }}</h2>
           <p>
@@ -34,7 +32,7 @@
           <i class="fa fa-close"></i>
         </div>
       </template>
-      <template v-slot:right="{ item }">
+      <template v-slot:right="{}">
         <div class="swipeout-action blue">
           <i class="fa fa-heart"></i>
         </div>

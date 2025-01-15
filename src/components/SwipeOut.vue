@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ref, watch, onBeforeUnmount, useSlots, type Ref, type VNodeRef } from "vue";
+// @ts-ignore
 import vTouchPan from "../directives/touch-horizontal-pan";
 import { translateX } from "../utils/translateX";
 import { areEqual } from "../utils/areEqual";

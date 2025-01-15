@@ -139,6 +139,7 @@ const _onClose = (item: any, index: number, event: any) => {
   emit("closed", {
     index,
     item,
+    event,
   });
   const { [index]: omit, ...newRevealed } = innerRevealed.value;
   _emitRevealed(newRevealed);

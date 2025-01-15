@@ -11,7 +11,7 @@ import SwipeOut from "./components/SwipeOut.vue";
     </template>
 
     <template v-slot:left="{ close }">
-      <div class="swipeout-action red" title="remove" @click="remove(item)">
+      <div class="swipeout-action red" title="remove" @click="close">
         <!-- place icon here or what ever you want -->
         <i class="fa fa-trash"></i>
       </div>
