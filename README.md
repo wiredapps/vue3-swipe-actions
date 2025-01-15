@@ -26,7 +26,7 @@ export default {
 ### Import Styles
 
 ```javascript
-import "@ahultgren/vue3-swipe-actions/dist/vue-swipe-actions.css";
+import "@ahultgren/vue3-swipe-actions/style.css";
 ```
 
 ### SwipeList
