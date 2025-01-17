@@ -1,38 +1,14 @@
 <template>
   <div :class="['swipeout-list', { 'swipeout--disabled': disabled }]">
-    <SwipeOut
-      v-for="(item, index) in items"
-      :key="index"
-      ref="itemRefs"
-      class="swipeout-list-item"
-      :disabled="disabled || itemDisabled(item)"
-      :threshold="threshold"
-      :revealed="innerRevealed[index]"
-      :passiveListeners="passiveListeners"
-      @revealed="(event) => _onReveal(item, index, event)"
-      @leftRevealed="
-        (event) => $emit('leftRevealed', { index, item, close: event.close })
-      "
-      @rightRevealed="
-        (event) => $emit('rightRevealed', { index, item, close: event.close })
-      "
-      @closed="(event) => _onClose(item, index, event)"
-      @active="$emit('active', $event)"
-    >
-      <template
-        v-if="slots.default"
-        #default="{ close, disabled, revealLeft, revealRight, revealed }"
-      >
+    <SwipeOut v-for="(item, index) in items" :key="index" ref="itemRefs" class="swipeout-list-item"
+      :disabled="disabled || itemDisabled(item)" :threshold="threshold" :revealed="innerRevealed[index]"
+      :passiveListeners="passiveListeners" @revealed="(event) => _onReveal(item, index, event)" @leftRevealed="(event) => $emit('leftRevealed', { index, item, close: event.close })
+        " @rightRevealed="(event) => $emit('rightRevealed', { index, item, close: event.close })
+        " @closed="(event) => _onClose(item, index, event)" @active="$emit('active', $event)">
+      <template v-if="slots.default" #default="{ close, disabled, revealLeft, revealRight, revealed }">
         <div ref="itemsContent" @click="$emit('swipeout:click', item)">
-          <slot
-            :item="item"
-            :index="index"
-            :close="close"
-            :disabled="disabled"
-            :revealed="revealed"
-            :revealLeft="revealLeft"
-            :revealRight="revealRight"
-          />
+          <slot :item="item" :index="index" :close="close" :disabled="disabled" :revealed="revealed"
+            :revealLeft="revealLeft" :revealRight="revealRight" />
         </div>
       </template>
       <template v-if="slots.left" #left="{ close }">
@@ -49,7 +25,7 @@
 import { ref, watch, defineProps, defineEmits, withDefaults, useSlots } from "vue";
 import SwipeOut from "./SwipeOut.vue";
 
-interface SwipeListProps<Item> {
+export interface SwipeListProps<Item> {
   items: Item[];
   itemKey?: string;
   threshold?: number;
