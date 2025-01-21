@@ -13,22 +13,38 @@
       @rightRevealed="setLastEvent('rightRevealed', $event)"
     >
       <template v-slot="{ item, index, revealed, disabled }">
-        <div ref="content" class="card-content" @click.native="itemClick(item)">
+        <div
+          ref="content"
+          class="card-content"
+          @click.native="itemClick(item)"
+        >
           <h2>{{ item.title }}</h2>
           <p>
             <b>id:</b> {{ item.id }} <b>description:</b> {{ item.description }}
-            <b>revealed:</b> {{ revealed || "false" }} <b>disabled:</b> {{ disabled }}
+            <b>revealed:</b> {{ revealed || "false" }} <b>disabled:</b>
+            {{ disabled }}
           </p>
           <b>index:</b><span> {{ index }}</span>
-          <input :id="`${index}disabled`" v-model="item.disabled" type="checkbox" />
+          <input
+            :id="`${index}disabled`"
+            v-model="item.disabled"
+            type="checkbox"
+          />
           <label :for="`${index}disabled`">Disabled</label>
         </div>
       </template>
       <template v-slot:left="{ item, close }">
-        <div class="swipeout-action red" title="remove" @click="remove(item)">
+        <div
+          class="swipeout-action red"
+          title="remove"
+          @click="remove(item)"
+        >
           <i class="fa fa-trash"></i>
         </div>
-        <div class="swipeout-action purple" @click="close">
+        <div
+          class="swipeout-action purple"
+          @click="close"
+        >
           <i class="fa fa-close"></i>
         </div>
       </template>
@@ -95,20 +111,52 @@ const page = ref(0);
 const revealed = ref<Record<string, string>>({});
 const list = ref<InstanceType<typeof SwipeList> | null>(null);
 
-const lastEventDescription = ref<{ name: string; index: number; id: string } | null>(
-  null
-);
+const lastEventDescription = ref<{
+  name: string;
+  index: number;
+  id: string;
+} | null>(null);
 
 const mockSwipeList = ref([
   [
-    { id: "a", title: "Item 1", description: "some description", disabled: false },
-    { id: "b", title: "Item 2", description: "some description", disabled: false },
-    { id: "c", title: "Item 3", description: "some description", disabled: false },
+    {
+      id: "a",
+      title: "Item 1",
+      description: "some description",
+      disabled: false,
+    },
+    {
+      id: "b",
+      title: "Item 2",
+      description: "some description",
+      disabled: false,
+    },
+    {
+      id: "c",
+      title: "Item 3",
+      description: "some description",
+      disabled: false,
+    },
   ],
   [
-    { id: "d", title: "Item 4", description: "some description", disabled: false },
-    { id: "e", title: "Item 5", description: "some description", disabled: false },
-    { id: "f", title: "Item 6", description: "some description", disabled: false },
+    {
+      id: "d",
+      title: "Item 4",
+      description: "some description",
+      disabled: false,
+    },
+    {
+      id: "e",
+      title: "Item 5",
+      description: "some description",
+      disabled: false,
+    },
+    {
+      id: "f",
+      title: "Item 6",
+      description: "some description",
+      disabled: false,
+    },
   ],
 ]);
 
@@ -134,7 +182,10 @@ const remove = (item: any) => {
   );
 };
 
-const setLastEvent = (name: string, { item, index }: { item: any; index: number }) => {
+const setLastEvent = (
+  name: string,
+  { item, index }: { item: any; index: number }
+) => {
   lastEventDescription.value = { name, index, id: item.id };
 };
 

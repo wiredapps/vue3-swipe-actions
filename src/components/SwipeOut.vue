@@ -76,26 +76,54 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div :ref="state.elRef" :class="['swipeout', { 'swipeout--disabled': disabled }]">
-    <div v-if="$slots.left" :ref="state.leftRef" class="swipeout-left">
-      <slot name="left" :close="close"></slot>
+  <div
+    :ref="state.elRef"
+    :class="['swipeout', { 'swipeout--disabled': disabled }]"
+  >
+    <div
+      v-if="$slots.left"
+      :ref="state.leftRef"
+      class="swipeout-left"
+    >
+      <slot
+        name="left"
+        :close="close"
+      ></slot>
     </div>
 
-    <div v-if="$slots.right" :ref="state.rightRef" class="swipeout-right">
-      <slot name="right" :close="close"></slot>
+    <div
+      v-if="$slots.right"
+      :ref="state.rightRef"
+      class="swipeout-right"
+    >
+      <slot
+        name="right"
+        :close="close"
+      ></slot>
     </div>
 
-    <div :ref="state.contentRef" class="swipeout-content" v-touch-pan="!disabled && ($slots.left || $slots.right)
-        ? {
-          handler: onPan,
-          horizontal: true,
-          mouse: true,
-          prevent: !passiveListeners,
-          mousePrevent: true,
-        }
-        : undefined
-      ">
-      <slot :revealLeft="revealLeft" :revealRight="revealRight" :disabled="disabled" :close="close"></slot>
+    <div
+      :ref="state.contentRef"
+      class="swipeout-content"
+      v-touch-pan="
+        !disabled && ($slots.left || $slots.right)
+          ? {
+              handler: onPan,
+              horizontal: true,
+              mouse: true,
+              prevent: !passiveListeners,
+              mousePrevent: true,
+            }
+          : undefined
+      "
+    >
+      <slot
+        :revealLeft="revealLeft"
+        :revealRight="revealRight"
+        :disabled="disabled"
+        :revealed="state.innerRevealed"
+        :close="close"
+      ></slot>
     </div>
   </div>
 </template>

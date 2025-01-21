@@ -7,15 +7,27 @@ import SwipeOut from "./components/SwipeOut.vue";
 
   <SwipeOut class="card">
     <template v-slot>
-      <div ref="content" class="card-content">Swipe!</div>
+      <div
+        ref="content"
+        class="card-content"
+      >
+        Swipe!
+      </div>
     </template>
 
     <template v-slot:left="{ close }">
-      <div class="swipeout-action red" title="remove" @click="close">
+      <div
+        class="swipeout-action red"
+        title="remove"
+        @click="close"
+      >
         <!-- place icon here or what ever you want -->
         <i class="fa fa-trash"></i>
       </div>
-      <div class="swipeout-action purple" @click="close">
+      <div
+        class="swipeout-action purple"
+        @click="close"
+      >
         <!-- place icon here or what ever you want -->
         <i class="fa fa-close"></i>
       </div>
