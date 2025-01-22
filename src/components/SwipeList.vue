@@ -2,12 +2,12 @@
   <div :class="['swipeout-list', { 'swipeout--disabled': disabled }]">
     <SwipeOut
       v-for="(item, index) in items"
-      :key="index"
+      :key="itemKey ? item[itemKey] : index"
       ref="itemRefs"
       class="swipeout-list-item"
       :disabled="disabled || itemDisabled(item)"
       :threshold="threshold"
-      :revealed="innerRevealed[index]"
+      :revealed="innerRevealed[itemKey ? item[itemKey] : index]"
       :passiveListeners="passiveListeners"
       @revealed="(event) => _onReveal(item, index, event)"
       @leftRevealed="
@@ -143,7 +143,11 @@ defineExpose({
     return itemRefs.value[index]?.close();
   },
   isRevealed(index: number) {
-    return innerRevealed.value[index] || false;
+    return (
+      innerRevealed.value[
+        props.itemKey ? props.items[index][props.itemKey] : index
+      ] || false
+    );
   },
 });
 
