@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onBeforeUnmount, useSlots } from "vue";
+import { watch, onBeforeUnmount, useSlots, toRef } from "vue";
 // @ts-ignore
 import vTouchPan from "../directives/touch-horizontal-pan";
 import { useSwipeState } from "../composables/useSwipeState";
@@ -41,15 +41,15 @@ const { reveal, close, revealLeft, revealRight } = useSwipeReveal(
   emit
 );
 
-const { onPan } = useSwipeGestures(
+const { onPan } = useSwipeGestures({
   state,
+  slots,
+  threshold: toRef(() => props.threshold),
+  disabled: toRef(() => props.disabled),
   animateSlide,
   reveal,
-  props.threshold,
-  slots,
   emit,
-  props.disabled
-);
+});
 
 watch(
   () => props.revealed,

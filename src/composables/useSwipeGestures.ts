@@ -1,5 +1,5 @@
 import type { SwipeState } from "./useSwipeState";
-import type { Slots } from "vue";
+import type { Ref, Slots } from "vue";
 
 interface PanEvent {
   evt: Event;
@@ -14,15 +14,25 @@ interface PanEvent {
   delta: { x: number; y: number };
 }
 
-export function useSwipeGestures(
-  state: SwipeState,
-  animateSlide: (to: number) => void,
-  reveal: (dir: "left" | "right" | false, recalculateWidth?: boolean) => void,
-  threshold: number,
-  slots: Slots,
-  emit: (event: "active", value: boolean) => void,
-  disabled: boolean
-) {
+interface SwipeGesturesArgs {
+  state: SwipeState;
+  animateSlide: (to: number) => void;
+  reveal: (dir: "left" | "right" | false, recalculateWidth?: boolean) => void;
+  threshold: Readonly<Ref<number>>;
+  slots: Slots;
+  emit: (event: "active", value: boolean) => void;
+  disabled: Readonly<Ref<boolean>>;
+}
+
+export function useSwipeGestures({
+  state,
+  slots,
+  threshold,
+  disabled,
+  animateSlide,
+  reveal,
+  emit,
+}: SwipeGesturesArgs) {
   const distanceSwiped = () => {
     const contentRect = state.contentRef.value!.getBoundingClientRect();
     const elementRect = state.elRef.value!.getBoundingClientRect();
@@ -60,8 +70,8 @@ export function useSwipeGestures(
     const newX = state.startLeft.value + offset.x;
 
     if (
-      (state.startLeft.value === 0 && Math.abs(newX) <= threshold) ||
-      (distance.x >= threshold &&
+      (state.startLeft.value === 0 && Math.abs(newX) <= threshold.value) ||
+      (distance.x >= threshold.value &&
         ((state.startLeft.value > 0 &&
           distance.x < state.leftActionsWidth.value) ||
           (state.startLeft.value < 0 &&
@@ -73,7 +83,7 @@ export function useSwipeGestures(
   };
 
   const onPan = (pan: PanEvent) => {
-    if (disabled) return null;
+    if (disabled.value) return null;
     if (pan.isFirst) return startListener(pan);
     if (!state.isActive.value) return null;
     if (pan.isFinal) return stopListener(pan);
