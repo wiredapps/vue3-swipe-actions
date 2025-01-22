@@ -1,4 +1,3 @@
-import { type Ref } from "vue";
 import { translateX } from "../utils/translateX";
 import type { Slots } from "vue";
 import type { SwipeState } from "./useSwipeState";
