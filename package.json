@@ -1,7 +1,7 @@
 {
   "name": "@ahultgren/vue3-swipe-actions",
   "private": false,
-  "version": "0.0.3",
+  "version": "0.0.4",
   "type": "module",
   "main": "dist/index.umd.ejs",
   "module": "dist/index.js",
