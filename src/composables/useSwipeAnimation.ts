@@ -12,18 +12,18 @@ export function useSwipeAnimation(state: SwipeState) {
     }
 
     state.frame.value = requestAnimationFrame(() => {
-      if (state.contentRef.value) {
+      if (state.elRef.value) {
         const leftWidth = getSlotWidth(state.leftRef.value);
         const rightWidth = getSlotWidth(state.rightRef.value);
 
         // Limit the swipe distance to the size of the respective slot
         if (to > 0) {
-          to = Math.min(to, leftWidth);
+          to = Math.min(to, leftWidth + leftWidth / 2);
         } else if (to < 0) {
-          to = Math.max(to, -rightWidth);
+          to = Math.max(to, -(rightWidth + rightWidth / 2));
         }
 
-        state.contentRef.value.style.transform = translateX(to);
+        state.elRef.value.style.transform = translateX(to);
       }
     });
   };

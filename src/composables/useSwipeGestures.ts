@@ -34,9 +34,8 @@ export function useSwipeGestures({
   emit,
 }: SwipeGesturesArgs) {
   const distanceSwiped = () => {
-    const contentRect = state.contentRef.value!.getBoundingClientRect();
     const elementRect = state.elRef.value!.getBoundingClientRect();
-    return contentRect.left - elementRect.left - state.elRef.value!.clientLeft;
+    return elementRect.left - state.elRef.value!.clientLeft;
   };
 
   const startListener = ({ distance }: PanEvent) => {
