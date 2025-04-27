@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { watch, onBeforeUnmount, useSlots, toRef } from "vue";
+import { watch, onBeforeUnmount, useSlots, toRef, onMounted, nextTick } from "vue";
 // @ts-ignore
 import vTouchPan from "../directives/touch-horizontal-pan";
 import { useSwipeState } from "../composables/useSwipeState";
@@ -33,7 +33,7 @@ const emit = defineEmits<{
 const slots = useSlots();
 const state = useSwipeState(props.revealed);
 
-const { animateSlide } = useSwipeAnimation(state, slots);
+const { animateSlide } = useSwipeAnimation(state);
 
 const { reveal, close, revealLeft, revealRight } = useSwipeReveal(
   state,
@@ -66,6 +66,16 @@ defineExpose({
   revealRight,
 });
 
+onMounted(() => {
+  nextTick(() => {
+    const leftSlotWidth = state.leftRef?.value?.offsetWidth || 0;
+    console.log("leftSlotWidth", leftSlotWidth, state);
+    if (state.elRef?.value) {
+      state.elRef.value.style.setProperty('--left-slot-width', `${leftSlotWidth}px`);
+    }
+  });
+});
+
 onBeforeUnmount(() => {
   clearTimeout(state.timer.value);
 
@@ -79,44 +89,30 @@ onBeforeUnmount(() => {
   <div
     :ref="state.elRef"
     :class="['swipeout', { 'swipeout--disabled': disabled }]"
+    :style="{ '--left-slot-width': `${state.leftRef?.value?.offsetWidth || 0}px` }"
   >
-    <div
-      v-if="$slots.left"
-      :ref="state.leftRef"
-      class="swipeout-left"
-    >
-      <slot
-        name="left"
-        :close="close"
-      ></slot>
-    </div>
-
-    <div
-      v-if="$slots.right"
-      :ref="state.rightRef"
-      class="swipeout-right"
-    >
-      <slot
-        name="right"
-        :close="close"
-      ></slot>
-    </div>
-
     <div
       :ref="state.contentRef"
       class="swipeout-content"
-      v-touch-pan="
-        !disabled && ($slots.left || $slots.right)
-          ? {
-              handler: onPan,
-              horizontal: true,
-              mouse: true,
-              prevent: !passiveListeners,
-              mousePrevent: true,
-            }
-          : undefined
-      "
+      v-touch-pan="!disabled && ($slots.left || $slots.right)
+        ? {
+          handler: onPan,
+          horizontal: true,
+          mouse: true,
+          prevent: !passiveListeners,
+          mousePrevent: true,
+        }
+        : undefined
+        "
     >
+      <div v-if="$slots.left" :ref="state.leftRef" class="swipeout-left" >
+        <slot name="left" :close="close" ></slot>
+      </div>
+
+      <div v-if="$slots.right" :ref="state.rightRef" class="swipeout-right" >
+        <slot name="right" :close="close" ></slot>
+      </div>
+
       <slot
         :revealLeft="revealLeft"
         :revealRight="revealRight"
@@ -138,19 +134,17 @@ onBeforeUnmount(() => {
 .swipeout .swipeout-left,
 .swipeout .swipeout-right {
   position: absolute;
-  height: 100%;
-  display: flex;
   z-index: 1;
 }
 
+/* Adjust the left property to avoid width calculation */
 .swipeout .swipeout-left {
-  left: 0;
   transform: translateX(-100%);
 }
 
 .swipeout .swipeout-right {
   right: 0;
-  transform: translateX(100%);
+  /* Ensure the width is dynamically set */
 }
 
 .swipeout .swipeout-content,
@@ -185,5 +179,11 @@ onBeforeUnmount(() => {
 
 .swipeout-list-item {
   flex: 1;
+}
+
+.swipeout-right {
+  position: absolute;
+  right: -100%;
+  width: 100%;
 }
 </style>
